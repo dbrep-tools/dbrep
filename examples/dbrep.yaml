@@ -1,0 +1,12 @@
+replications:
+  local2local:
+    src:
+      conn: postgre@local
+      rid: RID
+      table: test_src
+    dst: 
+      conn: postgre@local
+      rid: RID
+      table: test_dst
+    mode: incremental
+run: remote2remote

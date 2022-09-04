@@ -1,0 +1,53 @@
+tests:
+  test_sql2sql_int:
+    template: [sql2sql-base, pg2sql-table-int]
+    config:
+      src.conns: [postgres, mysql]
+      dst.conns: [postgres, mysql]
+    tests:
+      - name: simple
+        src.setup:
+          - insert into test_src (col) values (0), (3), (NULL)
+          - insert into test_src (col) values (11), (14)
+      - name: range
+        src.setup:
+          - insert into test_src (col) values (0), (3), (NULL)
+          - insert into test_src (col) values (-32768), (32767), (99999999)
+  test_sql2sql_float:
+    template: [sql2sql-base, pg2sql-table-float]
+    config:
+      src.conns: [postgres, mysql]
+      dst.conns: [postgres, mysql]
+    tests:
+      - name: simple
+        src.setup:
+          - insert into test_src (col) values (0), (3), (NULL)
+          - insert into test_src (col) values (-1.00003), (-1.3e29)
+  test_sql2sql_date:
+    template: [sql2sql-base, pg2sql-table-date]
+    config:
+      src.conns: [postgres, mysql]
+      dst.conns: [postgres, mysql]
+    tests:
+      - name: simple
+        src.setup:
+          - insert into test_src (col) values ('1998-08-11'), ('4000-01-01'), (NULL)
+  test_sql2sql_timestamp:
+    template: [sql2sql-base, pg2sql-table-timestamp]
+    config:
+      src.conns: [postgres, mysql]
+      dst.conns: [postgres, mysql]
+    tests:
+      - name: simple
+        src.setup:
+          - insert into test_src (col) values ('1998-08-11 01:23:45'), ('2022-01-01 02:53:25'), (NULL)
+  test_sql2sql_string:
+    template: [sql2sql-base, pg2sql-table-string]
+    config:
+      src.conns: [postgres, mysql]
+      dst.conns: [postgres, mysql]
+    tests:
+      - name: simple
+        src.setup:
+          - insert into test_src (col) values ('asd'), ('aSd'), (NULL)
+          - insert into test_src (col) values ('"as"'), ('\n')

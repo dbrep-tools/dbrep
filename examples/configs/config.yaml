@@ -1,0 +1,16 @@
+connections:
+    postgre@local:
+        engine: sqlalchemy
+        conn-str: 'postgresql+psycopg2://${local.pg.user}:${local.pg.pwd}@localhost:5432/postgres'
+    postgre@yacloud:
+        engine: sqlalchemy
+        conn-str: 'postgresql+psycopg2://${yacloud.pg.user}:${yacloud.pg.pwd}@51.250.111.83:5432/postgres'
+replications:
+  remote2remote:
+    src:
+      conn: postgre@yacloud
+      table: test_src
+    dst: 
+      conn: postgre@yacloud
+      table: test_dst
+    mode: full-refresh

@@ -1,0 +1,11 @@
+src:
+  engine: postgres@local
+  table: src_test1
+  rid: rid
+  batch_size: 100
+dst:
+  engine: postgres@local
+  table: dst_test1
+  rid: rid
+  batch_size: 10
+

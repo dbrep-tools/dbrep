@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:14.1-alpine
+    environment:
+      POSTGRES_DATABASE: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "postgres"]
+      timeout: 2s
+      interval: 5s
+      retries: 20
+      
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_DATABASE: mysql
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: mysql
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_HOST: "%"
+    expose:
+      - 3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u", "mysql", "-pmysql" ]
+      timeout: 2s
+      interval: 5s
+      retries: 20
+
+  test:
+    build: .
+    volumes:
+      - ../../:/app
+    command: "python test.py"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+
+networks:
+  default:
+    name: dbrep_test_network

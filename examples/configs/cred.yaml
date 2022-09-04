@@ -1,0 +1,8 @@
+local:
+    pg:
+        user: postgres
+        pwd: postgres
+yacloud:
+    pg:
+        user: postgres
+        pwd: postgres

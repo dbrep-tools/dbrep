@@ -1,0 +1,35 @@
+templates:
+  sql2sql-base:
+    config:
+      src:
+        table: test_src
+        rid: rid
+      dst:
+        table: test_dst
+        rid: rid
+      modes: [incremental, full-refresh]
+    test:
+      src.cleanup: drop table if exists test_src
+      dst.cleanup: drop table if exists test_dst
+  pg2sql-table-int:
+    test:
+      src.setup: create table test_src (rid serial, col integer)
+      dst.setup: create table test_dst (rid integer, col integer)
+  pg2sql-table-float:
+    test:
+      src.setup: create table test_src (rid serial, col float)
+      dst.setup: create table test_dst (rid integer, col float)
+  pg2sql-table-string:
+    test:
+      src.setup: create table test_src (rid serial, col varchar(255))
+      dst.setup: create table test_dst (rid integer, col varchar(255))
+  pg2sql-table-date:
+    test:
+      src.setup: create table test_src (rid serial, col date)
+      dst.setup: create table test_dst (rid integer, col date)
+  pg2sql-table-timestamp:
+    test:
+      src.setup: create table test_src (rid serial, col timestamp)
+      dst.setup: create table test_dst (rid integer, col timestamp)
+
+      

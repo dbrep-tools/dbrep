@@ -1,0 +1,15 @@
+postgres:
+  engine: sqlalchemy
+  test-driver: sqlalchemy
+  db-name: Postgres
+  conn-str: 'postgresql+psycopg2://postgres:postgres@postgres:5432/postgres'
+mysql:
+  engine: sqlalchemy
+  test-driver: sqlalchemy
+  db-name: MySQL
+  conn-str: 'mysql+mysqlconnector://mysql:mysql@mysql:3306/mysql'
+oracle:
+  engine: sqlalchemy
+  test-driver: sqlalchemy
+  db-name: Oracle
+  conn-str: 'oracle+cx_oracle://oracle:oracle@oracle:1521/oracle'
