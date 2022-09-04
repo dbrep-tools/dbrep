@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dbrep"
-version = "0.0.6"
+version = "0.0.7"
 description = "Package to sync tables across DBs, i.e. EL in ELT/ETL"
 authors = ["Valentin  Stepanovich <kolhizin@gmail.com>"]
 readme = "README.md"
