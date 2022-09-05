@@ -17,22 +17,35 @@ from .. import add_engine_factory
 
 class SQLAlchemyEngine(BaseEngine):
     id = 'sqlalchemy'
+    
+    @staticmethod
+    def _make_query_from_config( config):
+        if 'query' in config:
+            return '({}) t'.format(config['query'])
+        if 'schema' in config:
+            return '"{}"."{}"'.format(config['schema'], config['table'])
+        return '"{}"'.format(config['table'])
+
     def __init__(self, connection_config):
         import sqlalchemy #import only here when it will be actually used
-        def make_table_(table_name, col_names):
-            return sqlalchemy.Table(table_name, sqlalchemy.MetaData(),
-                        *[sqlalchemy.Column(x) for x in col_names]
+        def make_table_(table_name, schema_name, col_names):
+            meta = sqlalchemy.MetaData()
+            table_kw = {}
+            if schema_name:
+                table_kw['schema'] = schema_name
+            return sqlalchemy.Table(table_name, meta,
+                        *[sqlalchemy.Column(x) for x in col_names],
+                        **table_kw
                     )
 
-        self.engine = sqlalchemy.create_engine(connection_config['conn-str'])
+        self.engine = sqlalchemy.create_engine(connection_config['conn-str'], **connection_config.get('sqlalchemy-config', {}))
         self.conn = self.engine.connect()
         self.template_select_inc = 'select * from {src} where {rid} > {rid_value} order by {rid}'
         self.template_select_inc_null = 'select * from {src} order by {rid}'
         self.template_select_all = 'select * from {src}'
         self.template_select_rid = 'select max({rid}) from {src}'
-        self.template_truncate = 'truncate table {src}'
         self.make_query = sqlalchemy.text
-        self.make_table = lambda table_name, col_names: make_table_(table_name, col_names)
+        self.make_table = lambda table_name, schema_name, col_names: make_table_(table_name, schema_name, col_names)
         self.active_insert = None
         self.active_cursor = None
 
@@ -43,9 +56,10 @@ class SQLAlchemyEngine(BaseEngine):
             self.conn = self.engine.connect()
             return self.conn.execute(*args, **kwargs)
 
+
     def get_latest_rid(self, config):
         query = self.make_query(self.template_select_rid.format(
-            src='({}) t'.format(config['query']) if 'query' in config else config['table'],
+            src=SQLAlchemyEngine._make_query_from_config(config),
             rid=config['rid']
         ))
         res = self._execute(query).fetchall()
@@ -56,7 +70,7 @@ class SQLAlchemyEngine(BaseEngine):
     def begin_incremental_fetch(self, config, min_rid):
         template = self.template_select_inc if min_rid else self.template_select_inc_null
         query = self.make_query(template.format(
-            src='({}) t'.format(config['query']) if 'query' in config else config['table'],
+            src=SQLAlchemyEngine._make_query_from_config(config),
             rid=config['rid'],
             rid_value=min_rid
         ))
@@ -64,12 +78,12 @@ class SQLAlchemyEngine(BaseEngine):
 
     def begin_full_fetch(self, config):
         query = self.make_query(self.template_select_all.format(
-            src='({}) t'.format(config['query']) if 'query' in config else config['table']
+            src=SQLAlchemyEngine._make_query_from_config(config)
         ))
         self.active_cursor = self._execute(query)
 
     def begin_insert(self, config):
-        self.active_insert = functools.partial(self.make_table, table_name=config['table'])
+        self.active_insert = functools.partial(self.make_table, table_name=config['table'], schema_name=config.get('schema'))
 
     def fetch_batch(self, batch_size):
         if not self.active_cursor:
@@ -80,12 +94,6 @@ class SQLAlchemyEngine(BaseEngine):
     def insert_batch(self, names, batch):
         self._execute(self.active_insert(col_names=names).insert(), [dict(zip(names, x)) for x in batch])
 
-    def truncate(self, config):
-        self._execute(self.truncate_template.format(config['table']))
-
-    def create(self, config):
-        self._execute(config['create'])
-    
     def close(self):
         self.conn.close()
         self.engine.dispose()

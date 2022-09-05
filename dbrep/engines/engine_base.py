@@ -16,8 +16,14 @@ class BaseEngine:
     def begin_full_fetch(self, config):
         raise NotImplemented
 
-    def truncate(self, config):
+    def begin_insert(self, config):
         raise NotImplemented
 
-    def create(self, config):
+    def fetch_batch(self, batch_size):
+        raise NotImplemented
+
+    def insert_batch(self, names, batch):
+        raise NotImplemented
+
+    def close(self):
         raise NotImplemented

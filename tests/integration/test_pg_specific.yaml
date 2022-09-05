@@ -1,0 +1,55 @@
+tests:
+  test_pg2pg_schema_from:
+    config:
+      src:
+        conn: postgres
+        table: test_src
+        schema: test_schema_src
+        rid: rid
+      dst:
+        conn: postgres
+        table: test_dst
+        rid: rid
+      modes: [incremental, full-copy]
+    test:
+      src:
+        setup:
+          - create schema test_schema_src
+          - create table test_schema_src.test_src (rid serial, col integer)
+          - insert into test_schema_src.test_src (col) values (0), (3), (NULL)
+          - insert into test_schema_src.test_src (col) values (11), (14)
+        cleanup:
+          - drop table test_schema_src.test_src
+          - drop schema test_schema_src
+      dst:
+        setup:
+          - create table test_dst
+        cleanup:
+          - drop table test_dst
+  test_pg2pg_schema_to:
+    config:
+      src:
+        conn: postgres
+        table: test_src
+        rid: rid
+      dst:
+        conn: postgres
+        table: test_dst
+        schema: test_schema_dst
+        rid: rid
+      modes: [incremental, full-copy]
+    test:
+      src:
+        setup:
+          - create table test_src (rid serial, col integer)
+          - insert into test_src (col) values (0), (3), (NULL)
+          - insert into test_src (col) values (11), (14)
+        cleanup:
+          - drop table test_src
+      dst:
+        setup:
+          - create schema test_schema_dst
+          - create table test_schema_dst.test_dst
+        cleanup:
+          - drop table test_schema_dst.test_dst
+          - drop schema test_schema_dst
