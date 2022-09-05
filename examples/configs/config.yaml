@@ -13,4 +13,4 @@ replications:
     dst: 
       conn: postgre@yacloud
       table: test_dst
-    mode: full-refresh
+    mode: full-copy

@@ -6,7 +6,7 @@
 
 
 It supports 2 modes of work:
-- **Full-refresh** - truncate destination, load every record from source
+- **Full-copy** - truncate destination, load every record from source
 - **Incremental** - find latest *RID* in **Destination**, load increment from **Source**, insert into **Destination**
 
 Note, that this tool **DOES NOT** support update of existing records by incremental RID (i.e. PK and RID are different fields and RID indicates updates to rows). Main reason: it is post-transform, which should be performed by responsible tool.
@@ -48,17 +48,17 @@ Basic config will consist of following entries:
 ## Source
 Implements method *features()* which can contain:
 - **incremental**
-- **full-refresh** (e.g. not supported for Kafka)
+- **full-copy** (e.g. not supported for Kafka)
 
 ## Destination
 Implements method *features()* which can contain:
 - **incremental**
-- **full-refresh**
+- **full-copy**
 
 ## Replication
 Describes connection between two tables:
 - **Source** -- source connection
 - **Destination** -- destination connection
-- **Mode** -- full-refresh or incremental
+- **Mode** -- full-copy or incremental
 - **Config**
 - **Typing**
