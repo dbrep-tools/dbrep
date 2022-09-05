@@ -15,3 +15,5 @@ def create_engine(name, config):
     if name not in engine_factories:
         raise KeyError("Uknonwn engine: {}".format(name))
     return engine_factories[name](config)
+
+init_factory()
