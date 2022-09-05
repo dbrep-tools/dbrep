@@ -2,12 +2,12 @@ tests:
   test_pg2pg_schema_from:
     config:
       src:
-        conn: postgres
+        conns: [postgres]
         table: test_src
         schema: test_schema_src
         rid: rid
       dst:
-        conn: postgres
+        conns: [postgres]
         table: test_dst
         rid: rid
       modes: [incremental, full-copy]
@@ -23,17 +23,17 @@ tests:
           - drop schema test_schema_src
       dst:
         setup:
-          - create table test_dst
+          - create table test_dst (rid integer, col integer)
         cleanup:
           - drop table test_dst
   test_pg2pg_schema_to:
     config:
       src:
-        conn: postgres
+        conns: [postgres]
         table: test_src
         rid: rid
       dst:
-        conn: postgres
+        conns: [postgres]
         table: test_dst
         schema: test_schema_dst
         rid: rid
@@ -49,7 +49,7 @@ tests:
       dst:
         setup:
           - create schema test_schema_dst
-          - create table test_schema_dst.test_dst
+          - create table test_schema_dst.test_dst (rid integer, col integer)
         cleanup:
           - drop table test_schema_dst.test_dst
           - drop schema test_schema_dst

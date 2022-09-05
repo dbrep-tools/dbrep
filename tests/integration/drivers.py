@@ -12,7 +12,10 @@ class TestDriverSQLAlchemy:
         self.engine.execute(query)
 
     def fetchall(self, config):
-        cursor = self.engine.execute('select * from {}'.format(config['table']))
+        source = config['table']
+        if 'schema' in config:
+            source = '{}.{}'.format(config['schema'], config['table'])            
+        cursor = self.engine.execute('select * from {}'.format(source))
         keys = cursor.keys()
         data = cursor.fetchall()
         cursor.close() 

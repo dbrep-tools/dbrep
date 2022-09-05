@@ -23,8 +23,8 @@ class SQLAlchemyEngine(BaseEngine):
         if 'query' in config:
             return '({}) t'.format(config['query'])
         if 'schema' in config:
-            return '"{}"."{}"'.format(config['schema'], config['table'])
-        return '"{}"'.format(config['table'])
+            return '{}.{}'.format(config['schema'], config['table'])
+        return '{}'.format(config['table'])
 
     def __init__(self, connection_config):
         import sqlalchemy #import only here when it will be actually used
