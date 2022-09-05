@@ -29,7 +29,11 @@ def run_pull_push(src_engine, dst_engine, src_batch_size = 1000, dst_batch_size 
         counter += 1
         logging.info('Processed {} batch of size {}.'.format(counter, len(data)))
 
-def full_refresh(src_engine, dst_engine, config):
+def full_copy(src_engine, dst_engine, config):
+    """
+    Copies full content of source target into destination target.
+    NOTE: it does not truncate, clean or delete existing records from target! 
+    """
     logger.info('Starting replication.')
     src_engine.begin_full_fetch(config['src'])
     dst_engine.begin_insert(config['dst'])        
@@ -37,6 +41,11 @@ def full_refresh(src_engine, dst_engine, config):
     logger.info('Replication finished.')
 
 def incremental_update(src_engine, dst_engine, config):
+    """
+    Copies increment (new data) from source target into destination target.
+    It determines increment based on values of rid field in both source and target.
+    NOTE: it does not remove obsolete rids -- it is job of following Transform-tool like DBT.
+    """
     logger.debug('Making request to get <src> latest rid...')
     src_rid = src_engine.get_latest_rid(config['src'])
     if src_rid is None:

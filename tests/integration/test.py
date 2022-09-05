@@ -57,9 +57,9 @@ Test:
     dst-config: ...
 
 test_incremental
-test_full_refresh
+test_full_copy
 test_infer_incremental
-test_infer_full_refresh
+test_infer_full_copy
 
 1 step: create explicit tests
 2 step: create src -> dst structure

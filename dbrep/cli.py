@@ -7,7 +7,7 @@ from cryptography.fernet import Fernet
 import yaml
 
 from .config import make_config, merge_config, substitute_config
-from .replication import full_refresh, incremental_update
+from .replication import full_copy, incremental_update
 from . import create_engine, add_engine_factory, init_factory
 
 logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
@@ -130,9 +130,9 @@ def run(config : Dict):
     src_engine = make_engine(run_config['src']['conn'], config)
     dst_engine = make_engine(run_config['dst']['conn'], config)
 
-    if run_config['mode'] == 'full-refresh':
-        return full_refresh(src_engine, dst_engine, run_config)
+    if run_config['mode'] == 'full-copy':
+        return full_copy(src_engine, dst_engine, run_config)
     elif run_config['mode'] == 'incremental':
         return incremental_update(src_engine, dst_engine, run_config)
     else:
-        raise ValueError("Unsupported mode: {}. Should be full-refresh or incremental".format(run_config['mode']))
+        raise ValueError("Unsupported mode: {}. Should be full-copy or incremental".format(run_config['mode']))

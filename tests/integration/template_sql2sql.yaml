@@ -7,7 +7,7 @@ templates:
       dst:
         table: test_dst
         rid: rid
-      modes: [incremental, full-refresh]
+      modes: [incremental, full-copy]
     test:
       src.cleanup: drop table if exists test_src
       dst.cleanup: drop table if exists test_dst

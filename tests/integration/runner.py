@@ -6,7 +6,7 @@ import contextlib
 import errors
 from config import make_explicit_tests
 from dbrep import create_engine, init_factory
-from dbrep.replication import full_refresh, incremental_update
+from dbrep.replication import full_copy, incremental_update
 import dbrep.utils
 import dbrep.config
 from drivers import TestDriverSQLAlchemy
@@ -107,8 +107,8 @@ def run_test_stage(src_driver, dst_driver, src_engine, dst_engine, steps, config
 
     found_handler = True
     try:
-        if config['mode'] == 'full-refresh':
-            full_refresh(src_engine, dst_engine, config)
+        if config['mode'] == 'full-copy':
+            full_copy(src_engine, dst_engine, config)
         elif config['mode'] == 'incremental':
             incremental_update(src_engine, dst_engine, config)
         else:
@@ -116,7 +116,7 @@ def run_test_stage(src_driver, dst_driver, src_engine, dst_engine, steps, config
     except Exception as e:
         raise errors.FailedReplicationError('Failed to run replication!', e) from e
     if not found_handler:
-        raise errors.InvalidTestConfigError("Unsupported mode: {}. Should be full-refresh or incremental".format(config['mode']))
+        raise errors.InvalidTestConfigError("Unsupported mode: {}. Should be full-copy or incremental".format(config['mode']))
 
 def test_replication(src_keys, src_data, dst_keys, dst_data):
     try:
