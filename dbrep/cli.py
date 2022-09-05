@@ -113,9 +113,10 @@ def make_engine(conn_config: Union[Dict, str], full_config: Dict):
 def run(config : Dict):
     init_factory()
     if 'run' not in config:
-        raise ValueError("Must specify `run` parameter: either name of replication from config, or dictionary specifying replication!")
-
-    if isinstance(config['run'], str):
+        if 'mode' not in config or 'src' not in config or 'dst' not in config:
+            raise ValueError("Must specify `run` parameter: either name of replication from config, or dictionary specifying replication! Or specify mode, src and dst!")
+        run_config = config
+    elif isinstance(config['run'], str):
         run_config = config['replications'][config['run']] #Propagate exceptions
     elif isinstance(config['run'], dict):
         run_config = config['run']
