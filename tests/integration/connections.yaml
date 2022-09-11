@@ -3,11 +3,40 @@ postgres:
   test-driver: sqlalchemy
   db-name: Postgres
   conn-str: 'postgresql+psycopg2://postgres:postgres@postgres:5432/postgres'
+postgres-dbapi:
+  engine: dbapi
+  test-driver: sqlalchemy
+  db-name: Postgres
+  conn-str: 'postgresql+psycopg2://postgres:postgres@postgres:5432/postgres'
+  driver: psycopg2
+  database: postgres
+  user: postgres
+  password: postgres
+  host: postgres
+postgres-pgcopy:
+  engine: pgcopy
+  test-driver: sqlalchemy
+  db-name: Postgres
+  conn-str: 'postgresql+psycopg2://postgres:postgres@postgres:5432/postgres'
+  database: postgres
+  user: postgres
+  password: postgres
+  host: postgres
 mysql:
   engine: sqlalchemy
   test-driver: sqlalchemy
   db-name: MySQL
   conn-str: 'mysql+mysqlconnector://mysql:mysql@mysql:3306/mysql'
+mysql-dbapi:
+  engine: dbapi
+  test-driver: sqlalchemy
+  db-name: MySQL
+  conn-str: 'mysql+mysqlconnector://mysql:mysql@mysql:3306/mysql'
+  driver: mysql.connector
+  database: mysql
+  user: mysql
+  password: mysql
+  host: mysql  
 oracle:
   engine: sqlalchemy
   test-driver: sqlalchemy

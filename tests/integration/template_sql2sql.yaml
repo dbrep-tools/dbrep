@@ -15,6 +15,10 @@ templates:
     test:
       src.setup: create table test_src (rid serial, col integer)
       dst.setup: create table test_dst (rid integer, col integer)
+  pg2sql-table-numeric2:
+    test:
+      src.setup: create table test_src (rid serial, col numeric(4,2))
+      dst.setup: create table test_dst (rid integer, col numeric(4,2))
   pg2sql-table-float:
     test:
       src.setup: create table test_src (rid serial, col float)

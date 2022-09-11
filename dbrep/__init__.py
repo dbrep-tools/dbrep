@@ -8,7 +8,11 @@ def add_engine_factory(name, factory):
 
 def init_factory():
     from .engines.engine_sqlalchemy import SQLAlchemyEngine
+    from .engines.engine_dbapi import DBAPIEngine
+    from .engines.engine_pgcopy import PGCopyEngine
     add_engine_factory(SQLAlchemyEngine.id, SQLAlchemyEngine)
+    add_engine_factory(DBAPIEngine.id, DBAPIEngine)
+    add_engine_factory(PGCopyEngine.id, PGCopyEngine)
 
 def create_engine(name, config):
     global engine_factories
