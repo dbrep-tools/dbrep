@@ -1,15 +1,3 @@
-
-# Performance notes (based on simple test, without detailed hyperparameters and size comparisons):
-# 1) pandas uses sqlalchemy with execute(table.insert(), data) -- set it as baseline
-#    there are 3 option for insert method: None, 'multi' and custom (e.g. PG COPY)
-# 2) None is versatile and fastest (100% time)
-# 3) 'multi' is unexpectedly slower (700% time)
-# 4) PG COPY is much faster (30% time)
-# 5) None performance is attained using sqlalchemy.execute and passing list of dictionaries for bind params
-# 6) Much faster alternative is insert values (), (), (), () using mogrify on python side ~50% time
-#
-# HENCE primary solution to test against pandas: mogrify inside python, insert with several simple executes
-
 import functools
 import importlib
 

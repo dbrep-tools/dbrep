@@ -13,6 +13,15 @@ postgres-dbapi:
   user: postgres
   password: postgres
   host: postgres
+postgres-pgcopy:
+  engine: pgcopy
+  test-driver: sqlalchemy
+  db-name: Postgres
+  conn-str: 'postgresql+psycopg2://postgres:postgres@postgres:5432/postgres'
+  database: postgres
+  user: postgres
+  password: postgres
+  host: postgres
 mysql:
   engine: sqlalchemy
   test-driver: sqlalchemy
