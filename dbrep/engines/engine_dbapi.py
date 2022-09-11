@@ -31,7 +31,7 @@ class DBAPIEngine(BaseEngine):
     def _insert_pyformat(cursor, table, names, values):
         col_names = ','.join(names)
         val_names = ','.join(['%({})s'.format(x) for x in names])
-        query = 'insert int {} ({}) values ({})'.format(table, col_names, val_names)
+        query = 'insert into {} ({}) values ({})'.format(table, col_names, val_names)
         cursor.executemany(query, [dict(zip(names, x)) for x in values])
 
     def __init__(self, connection_config):     
@@ -54,23 +54,24 @@ class DBAPIEngine(BaseEngine):
         
 
     def get_latest_rid(self, config):
-        query = self.make_query(self.template_select_rid.format(
+        query = self.template_select_rid.format(
             src=DBAPIEngine._make_query_from_config(config),
             rid=config['rid']
-        ))
+        )
         with self.conn.cursor() as cur:
-            res = cur.execute(query).fetchall()
+            cur.execute(query)
+            res = cur.fetchall()
         if res is None or len(res) == 0:
             return None
         return res[0][0]
 
     def begin_incremental_fetch(self, config, min_rid):
         template = self.template_select_inc if min_rid else self.template_select_inc_null
-        query = self.make_query(template.format(
+        query = template.format(
             src=DBAPIEngine._make_query_from_config(config),
             rid=config['rid'],
             rid_value=min_rid
-        ))
+        )
         if self.active_cursor:
             self.active_cursor.close()
 
@@ -78,9 +79,9 @@ class DBAPIEngine(BaseEngine):
         self.active_cursor.execute(query)
 
     def begin_full_fetch(self, config):
-        query = self.make_query(self.template_select_all.format(
+        query = self.template_select_all.format(
             src=DBAPIEngine._make_query_from_config(config)
-        ))
+        )
         if self.active_cursor:
             self.active_cursor.close()
 
@@ -96,8 +97,9 @@ class DBAPIEngine(BaseEngine):
     def fetch_batch(self, batch_size):
         if not self.active_cursor:
             raise Exception()
-        print(self.active_cursor.description)
-        raise Exception(self.active_cursor.description)
+        tmp = [x.name for x in self.active_cursor.description]
+        print(tmp)
+        raise Exception(tmp)
         keys = list(self.active_cursor.description)
         return keys, self.active_cursor.fetchmany(batch_size)
 
