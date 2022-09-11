@@ -97,15 +97,10 @@ class DBAPIEngine(BaseEngine):
     def fetch_batch(self, batch_size):
         if not self.active_cursor:
             raise Exception()
-        tmp = [x.name for x in self.active_cursor.description]
-        print(tmp)
-        raise Exception(tmp)
-        keys = list(self.active_cursor.description)
+        keys = [x[0] if isinstance(x, tuple) else x.name for x in self.active_cursor.description]
         return keys, self.active_cursor.fetchmany(batch_size)
 
     def insert_batch(self, names, batch):
-        str_names = ','.join(names)
-        str_values = ','.join([':{}'.format(x) for x in names])
         with self.conn.cursor() as cur:
             self.fn_insert(cur, self.active_insert, names, batch)
         self.conn.commit()

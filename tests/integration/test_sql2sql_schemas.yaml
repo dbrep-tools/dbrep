@@ -2,12 +2,12 @@ tests:
   test_pg2pg_schema_from:
     config:
       src:
-        conns: [postgres]
+        conns: [postgres, postgres-dbapi]
         table: test_src
         schema: test_schema_src
         rid: rid
       dst:
-        conns: [postgres]
+        conns: [postgres, postgres-dbapi]
         table: test_dst
         rid: rid
       modes: [incremental, full-copy]
@@ -29,11 +29,11 @@ tests:
   test_pg2pg_schema_to:
     config:
       src:
-        conns: [postgres]
+        conns: [postgres, postgres-dbapi]
         table: test_src
         rid: rid
       dst:
-        conns: [postgres]
+        conns: [postgres, postgres-dbapi]
         table: test_dst
         schema: test_schema_dst
         rid: rid

@@ -18,6 +18,16 @@ mysql:
   test-driver: sqlalchemy
   db-name: MySQL
   conn-str: 'mysql+mysqlconnector://mysql:mysql@mysql:3306/mysql'
+mysql-dbapi:
+  engine: dbapi
+  test-driver: sqlalchemy
+  db-name: MySQL
+  conn-str: 'mysql+mysqlconnector://mysql:mysql@mysql:3306/mysql'
+  driver: mysql.connector
+  database: mysql
+  user: mysql
+  password: mysql
+  host: mysql  
 oracle:
   engine: sqlalchemy
   test-driver: sqlalchemy
