@@ -76,7 +76,7 @@ def run_dbrep_dbapi_full_copy(test):
     })
 
 
-def run_dbrep_dbapi_full_copy(test):
+def run_dbrep_pgcopy_full_copy(test):
     src_desc, src_conn1 = test.src_conn_str.split('://')
     src_cred, src_db1 = src_conn1.split('@')
     dst_desc, dst_conn1 = test.dst_conn_str.split('://')
@@ -137,7 +137,7 @@ if __name__ == '__main__':
         test.reset()
         print('Running replication...')
         t0 = time.time()
-        run_dbrep_sqla_increment(test)
+        run_dbrep_dbapi_full_copy(test)
         t1 = time.time()
         print('run_dbrep_dbapi_full_copy: {:.2f}'.format(t1-t0))
         
@@ -145,7 +145,7 @@ if __name__ == '__main__':
         test.reset()
         print('Running replication...')
         t0 = time.time()
-        run_dbrep_sqla_increment(test)
+        run_dbrep_pgcopy_full_copy(test)
         t1 = time.time()
         print('run_dbrep_pgcopy_full_copy: {:.2f}'.format(t1-t0))
         
