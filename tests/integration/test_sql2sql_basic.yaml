@@ -16,8 +16,8 @@ tests:
   test_sql2sql_float:
     template: [sql2sql-base, pg2sql-table-float]
     config:
-      src.conns: [postgres, mysql, postgres-dbapi]
-      dst.conns: [postgres, mysql, postgres-dbapi]
+      src.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
+      dst.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
     tests:
       - name: simple
         src.setup:
@@ -26,8 +26,8 @@ tests:
   test_sql2sql_float:
     template: [sql2sql-base, pg2sql-table-numeric2]
     config:
-      src.conns: [postgres, mysql, postgres-dbapi]
-      dst.conns: [postgres, mysql, postgres-dbapi]
+      src.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
+      dst.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
     tests:
       - name: simple
         src.setup:
@@ -36,8 +36,8 @@ tests:
   test_sql2sql_date:
     template: [sql2sql-base, pg2sql-table-date]
     config:
-      src.conns: [postgres, mysql, postgres-dbapi]
-      dst.conns: [postgres, mysql, postgres-dbapi]
+      src.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
+      dst.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
     tests:
       - name: simple
         src.setup:
@@ -45,8 +45,8 @@ tests:
   test_sql2sql_timestamp:
     template: [sql2sql-base, pg2sql-table-timestamp]
     config:
-      src.conns: [postgres, mysql, postgres-dbapi]
-      dst.conns: [postgres, mysql, postgres-dbapi]
+      src.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
+      dst.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
     tests:
       - name: simple
         src.setup:
@@ -54,8 +54,8 @@ tests:
   test_sql2sql_string:
     template: [sql2sql-base, pg2sql-table-string]
     config:
-      src.conns: [postgres, mysql, postgres-dbapi]
-      dst.conns: [postgres, mysql, postgres-dbapi]
+      src.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
+      dst.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
     tests:
       - name: simple
         src.setup:
