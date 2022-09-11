@@ -22,12 +22,24 @@ class DBAPIEngine(BaseEngine):
         query = 'insert into {} ({}) values ({})'.format(table, col_names, val_names)
         cursor.executemany(query, [dict(zip(names, x)) for x in values])
 
+        
+    @staticmethod
+    def _insert_pyformat_optimized(cursor, table, names, values):
+        batch_size = 1000
+        col_names = ','.join(names)
+        row_tmplt = '({})'.format(','.join(['%s']*len(names)))
+        query_top = 'insert into {} ({}) values '.format(table, col_names)
+        for i in range(0, len(values), batch_size):
+            batch = values[i:min(i+batch_size, len(values))]
+            query = query_top + ','.join([row_tmplt]*len(batch))
+            cursor.execute(query, [v for x in batch for v in x])
+        
     def __init__(self, connection_config):     
         self.driver_name = connection_config['driver']
         self.driver = importlib.import_module(self.driver_name)
         if self.driver.paramstyle != 'pyformat':
             raise NotImplementedError('Support for drivers with paramstyle other than pyformat is not implemented!')
-        self.fn_insert = DBAPIEngine._insert_pyformat
+        self.fn_insert = DBAPIEngine._insert_pyformat_optimized
 
         driver_keywords = ['dsn', 'database', 'user', 'host', 'password']
         driver_params = {k: v for k,v in connection_config.items() if k in driver_keywords}
