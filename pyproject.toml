@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "dbrep"
-version = "0.0.9"
+version = "0.0.8"
 description = "Package to sync tables across DBs, i.e. EL in ELT/ETL"
 authors = ["Valentin  Stepanovich <kolhizin@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = ">=3.8"
 cryptography = "^37.0.4"
 SQLAlchemy = "^1.4.40"
 PyYAML = ">=5.0"
@@ -17,6 +17,7 @@ psycopg2 = "^2.9.3"
 coverage = "^6.0.0"
 cx-Oracle = "^8.3.0"
 mysql-connector-python = "^8.0.30"
+pandas = "^1.4.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
