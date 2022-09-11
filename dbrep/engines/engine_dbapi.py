@@ -27,9 +27,20 @@ class DBAPIEngine(BaseEngine):
             return '{}.{}'.format(config['schema'], config['table'])
         return '{}'.format(config['table'])
 
-    def __init__(self, connection_config):        
+    @staticmethod
+    def _insert_pyformat(cursor, table, names, values):
+        col_names = ','.join(names)
+        val_names = ','.join(['%({})s'.format(x) for x in names])
+        query = 'insert int {} ({}) values ({})'.format(table, col_names, val_names)
+        cursor.executemany(query, [dict(zip(names, x)) for x in values])
+
+    def __init__(self, connection_config):     
         self.driver_name = connection_config['driver']
         self.driver = importlib.import_module(self.driver_name)
+        if self.driver.paramstyle != 'pyformat':
+            raise NotImplementedError('Support for drivers with paramstyle other than pyformat is not implemented!')
+        self.fn_insert = DBAPIEngine._insert_pyformat
+
         driver_keywords = ['dsn', 'database', 'user', 'host', 'password']
         driver_params = {k: v for k,v in connection_config.items() if k in driver_keywords}
         driver_params.update(connection_config.get('driver-params', {}))
@@ -40,15 +51,7 @@ class DBAPIEngine(BaseEngine):
         self.template_select_rid = 'select max({rid}) from {src}'
         self.active_cursor = None
         self.active_insert = None
-
-    def _execute(self, *args, **kwargs):
-        raise NotImplementedError
-        try:
-            return self.conn.execute(*args, **kwargs)
-        except ConnectionError:
-            self.conn = self.engine.connect()
-            return self.conn.execute(*args, **kwargs)
-
+        
 
     def get_latest_rid(self, config):
         query = self.make_query(self.template_select_rid.format(
@@ -88,7 +91,7 @@ class DBAPIEngine(BaseEngine):
         name = config['table']
         if 'schema' in config:
             name = '{}.{}'.format(config['schema'], name)
-        self.active_insert = 'insert into {}'.format(name)
+        self.active_insert = name
 
     def fetch_batch(self, batch_size):
         if not self.active_cursor:
@@ -101,9 +104,8 @@ class DBAPIEngine(BaseEngine):
     def insert_batch(self, names, batch):
         str_names = ','.join(names)
         str_values = ','.join([':{}'.format(x) for x in names])
-        print(self.conn.paramstyle)
         with self.conn.cursor() as cur:
-            cur.executemany('{} ({}) values ({})'.format(self.active_insert, str_names, str_values), [dict(zip(names, x)) for x in batch])
+            self.fn_insert(cur, self.active_insert, names, batch)
         self.conn.commit()
 
     def close(self):
