@@ -23,3 +23,16 @@ class TestDriverSQLAlchemy:
 
     def dispose(self):
         self.engine.dispose()
+
+class TestDriverKafka:
+    def __init__(self, config):
+        pass
+
+    def execute(self, query):
+        pass
+
+    def fetchall(self, config):
+        pass
+
+    def dispose(self):
+        pass
