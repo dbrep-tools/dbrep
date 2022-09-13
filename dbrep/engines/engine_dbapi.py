@@ -1,5 +1,6 @@
 import functools
 import importlib
+from sqlite3 import Cursor
 
 from .engine_base import BaseEngine
 from .. import add_engine_factory
@@ -24,13 +25,13 @@ class DBAPIEngine(BaseEngine):
 
         
     @staticmethod
-    def _insert_pyformat_optimized(cursor, table, names, values):
-        batch_size = 1000
+    def _insert_pyformat_optimized(cursor, table, names, values, batch_size=1000):
+        batch_rows = max(1, int(batch_size / len(names)))
         col_names = ','.join(names)
         row_tmplt = '({})'.format(','.join(['%s']*len(names)))
         query_top = 'insert into {} ({}) values '.format(table, col_names)
-        for i in range(0, len(values), batch_size):
-            batch = values[i:min(i+batch_size, len(values))]
+        for i in range(0, len(values), batch_rows):
+            batch = values[i:min(i+batch_rows, len(values))]
             query = query_top + ','.join([row_tmplt]*len(batch))
             cursor.execute(query, [v for x in batch for v in x])
         
@@ -39,18 +40,27 @@ class DBAPIEngine(BaseEngine):
         self.driver = importlib.import_module(self.driver_name)
         if self.driver.paramstyle != 'pyformat':
             raise NotImplementedError('Support for drivers with paramstyle other than pyformat is not implemented!')
-        self.fn_insert = DBAPIEngine._insert_pyformat_optimized
-
+        
         driver_keywords = ['dsn', 'database', 'user', 'host', 'port', 'password']
         driver_params = {k: v for k,v in connection_config.items() if k in driver_keywords}
         driver_params.update(connection_config.get('driver-params', {}))
         self.conn = self.driver.connect(**driver_params)
+
         self.template_select_inc = 'select * from {src} where {rid} > {rid_value} order by {rid}'
         self.template_select_inc_null = 'select * from {src} order by {rid}'
         self.template_select_all = 'select * from {src}'
         self.template_select_rid = 'select max({rid}) from {src}'
+        self.execute_batch_elems = connection_config.get('execute_batch_num_elems', 1000)
         self.active_cursor = None
         self.active_insert = None
+
+    def insert_batch_(self, names, batch):
+        with self.conn.cursor() as cur:
+            if self.driver.paramstyle == 'pyformat':
+                DBAPIEngine._insert_pyformat_optimized(cur, self.active_insert, names, batch,
+                    batch_size=self.override_execute_batch_elems or self.execute_batch_elems)
+            else:
+                raise NotImplementedError('Support for drivers with paramstyle other than pyformat is not implemented!')
         
 
     def get_latest_rid(self, config):
@@ -92,6 +102,7 @@ class DBAPIEngine(BaseEngine):
         name = config['table']
         if 'schema' in config:
             name = '{}.{}'.format(config['schema'], name)
+        self.override_execute_batch_elems = config.get('execute_batch_num_elems')
         self.active_insert = name
 
     def fetch_batch(self, batch_size):
@@ -101,8 +112,7 @@ class DBAPIEngine(BaseEngine):
         return keys, self.active_cursor.fetchmany(batch_size)
 
     def insert_batch(self, names, batch):
-        with self.conn.cursor() as cur:
-            self.fn_insert(cur, self.active_insert, names, batch)
+        self.insert_batch_(names, batch)
         self.conn.commit()
 
     def close(self):
