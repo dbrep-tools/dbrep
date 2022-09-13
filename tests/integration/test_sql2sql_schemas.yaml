@@ -7,7 +7,7 @@ tests:
         schema: test_schema_src
         rid: rid
       dst:
-        conns: [postgres, postgres-dbapi]
+        conns: [postgres, postgres-dbapi, postgres-pgcopy]
         table: test_dst
         rid: rid
       modes: [incremental, full-copy]
@@ -33,7 +33,7 @@ tests:
         table: test_src
         rid: rid
       dst:
-        conns: [postgres, postgres-dbapi]
+        conns: [postgres, postgres-dbapi, postgres-pgcopy]
         table: test_dst
         schema: test_schema_dst
         rid: rid

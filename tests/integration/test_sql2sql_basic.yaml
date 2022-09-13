@@ -37,7 +37,7 @@ tests:
     template: [sql2sql-base, pg2sql-table-date]
     config:
       src.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
-      dst.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi]
+      dst.conns: [postgres, mysql, postgres-dbapi, mysql-dbapi, postgres-pgcopy]
     tests:
       - name: simple
         src.setup:

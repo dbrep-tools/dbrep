@@ -10,7 +10,6 @@ class PGCopyEngine(DBAPIEngine):
     id = 'pgcopy'
     
     def __init__(self, connection_config):     
-        print('Warning! This is experimental feature! Does not work with timestamps, dates, special characters in strings!')
         connection_config['driver'] = 'psycopg2'
         super().__init__(connection_config)
 
@@ -19,7 +18,6 @@ class PGCopyEngine(DBAPIEngine):
 
         cw = csv.writer(buffer, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         cw.writerows(batch)
-        #template = ';'.join(['%s']*len(names))
         buffer.seek(0)
 
         query = """
