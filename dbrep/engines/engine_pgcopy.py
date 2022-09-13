@@ -1,4 +1,5 @@
 
+import csv
 from io import StringIO
 from re import template
 
@@ -16,14 +17,17 @@ class PGCopyEngine(DBAPIEngine):
     def insert_batch(self, names, batch):
         buffer = StringIO()
 
-        template = ';'.join(['%s']*len(names))
+        cw = csv.writer(buffer, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        cw.writerows(batch)
+        #template = ';'.join(['%s']*len(names))
+        buffer.seek(0)
+
+        query = """
+        copy {} from stdin csv delimiter ';'
+        """.format(self.active_insert)
 
         with self.conn.cursor() as cur:
-            body = [cur.mogrify(template, x).decode('utf8') for x in batch]
-            buffer.write('\n'.join(body))
-            buffer.seek(0)
-
-            cur.copy_from(buffer, self.active_insert, sep=";", null='NULL')
+            cur.copy_expert(query, buffer)
         self.conn.commit()
 
 add_engine_factory(PGCopyEngine.id, PGCopyEngine)
