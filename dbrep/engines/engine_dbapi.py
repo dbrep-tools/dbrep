@@ -41,7 +41,7 @@ class DBAPIEngine(BaseEngine):
             raise NotImplementedError('Support for drivers with paramstyle other than pyformat is not implemented!')
         self.fn_insert = DBAPIEngine._insert_pyformat_optimized
 
-        driver_keywords = ['dsn', 'database', 'user', 'host', 'password']
+        driver_keywords = ['dsn', 'database', 'user', 'host', 'port', 'password']
         driver_params = {k: v for k,v in connection_config.items() if k in driver_keywords}
         driver_params.update(connection_config.get('driver-params', {}))
         self.conn = self.driver.connect(**driver_params)
