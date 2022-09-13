@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  server:
+  clickhouse:
     image: yandex/clickhouse-server:21.3
     expose:
       - 8123
