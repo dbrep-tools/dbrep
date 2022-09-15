@@ -60,4 +60,4 @@ tests:
       - name: simple
         src.setup:
           - insert into test_src (col) values ('asd'), ('aSd'), ('aS,;\t\nd'), (NULL)
-          - insert into test_src (col) values ('"as"'), ('\n')
+          - insert into test_src (col) values ('"as"'), ('\n')          
