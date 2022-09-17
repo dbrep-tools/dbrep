@@ -42,6 +42,7 @@ class KafkaEngine(BaseEngine):
         self.conversion_ = create_conversion(connection_config['format'], connection_config.get('format-config', {}))
         self.active_consumer_ = None
         self.active_producer_ = None
+        self.default_timeout_ = 10.0
 
     def get_latest_rid(self, config):
         override = {
@@ -51,7 +52,7 @@ class KafkaEngine(BaseEngine):
         consumer = confluent_kafka.Consumer(self.flatten_configs_(config.get('kafka', {}), override))
         try:
             consumer.subscribe([config['topic']])
-            msg = consumer.poll(config.get('timeout', 5.0))
+            msg = consumer.poll(config.get('timeout', self.default_timeout_))
         finally:
             consumer.close()
         if msg is None:
@@ -65,7 +66,7 @@ class KafkaEngine(BaseEngine):
             'enable.auto.commit': True,
         } 
         self.activate_consumer_(config['topic'], config.get('kafka', {}), override)
-        self.consume_timeout_ = config.get('consume_timeout', 10.0)
+        self.timeout_ = config.get('timeout', self.default_timeout_)
 
     def begin_full_fetch(self, config):
         override = {
@@ -73,7 +74,7 @@ class KafkaEngine(BaseEngine):
             'enable.auto.commit': True
         } 
         self.activate_consumer_(config['topic'], config.get('kafka', {}), override)
-        self.consume_timeout_ = config.get('consume_timeout', 10.0)
+        self.timeout_ = config.get('timeout', self.default_timeout_)
 
     def begin_insert(self, config):
         self.activate_producer_(config['topic'], config.get('kafka', {}))
@@ -82,7 +83,7 @@ class KafkaEngine(BaseEngine):
         if not self.active_consumer_:
             raise Exception("No active consumer!")
         objs = []
-        msgs = self.active_consumer_.consume(batch_size, self.consume_timeout_)
+        msgs = self.active_consumer_.consume(batch_size, self.timeout_)
         errs = [x.error() for x in msgs if x is not None and x.error() is not None]
         objs = [self.conversion_.from_bytes(x.value()) for x in msgs if x is not None and x.error() is None]
 
