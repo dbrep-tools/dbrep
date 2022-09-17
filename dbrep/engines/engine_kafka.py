@@ -20,22 +20,22 @@ class KafkaEngine(BaseEngine):
             cfg.update(c)
         return cfg 
 
-    def activate_consumer_(self, *configs):
+    def activate_consumer_(self, topic, *configs):
         if self.active_consumer_ is not None:
             self.active_consumer_.close()
             self.active_consumer_ = None
         cfg = self.flatten_configs_(*configs)
         self.active_consumer_ = confluent_kafka.Consumer(cfg)
-        self.active_consumer_.subscribe([cfg['topic']])
-        self.active_topic_ = cfg['topic']
+        self.active_consumer_.subscribe([topic])
+        self.active_topic_ = topic
 
-    def activate_producer_(self, *configs):
+    def activate_producer_(self, topic, *configs):
         if self.active_producer_ is not None:
             self.active_producer_.close()
             self.active_producer_ = None
         cfg = self.flatten_configs_(*configs)
         self.active_producer_ = confluent_kafka.Producer(cfg)
-        self.active_topic_ = cfg['topic']
+        self.active_topic_ = topic
     
     def __init__(self, connection_config):
         self.kafka_config_ = copy.deepcopy(connection_config['kafka'])
@@ -48,10 +48,9 @@ class KafkaEngine(BaseEngine):
             'auto.offset.reset': 'latest',
             'enable.auto.commit': False
         } 
-        if 'topic' in config:
-            override['topic'] = config['topic']
         consumer = confluent_kafka.Consumer(self.flatten_configs_(config.get('kafka', {}), override))
         try:
+            consumer.subscribe([config['topic']])
             msg = consumer.poll(1.0)
         finally:
             consumer.close()
@@ -64,24 +63,17 @@ class KafkaEngine(BaseEngine):
             'auto.offset.reset': 'latest',
             'enable.auto.commit': True,
         } 
-        if 'topic' in config:
-            override['topic'] = config['topic']
-        self.activate_consumer_(config.get('kafka', {}), override)
+        self.activate_consumer_(config['topic'], config.get('kafka', {}), override)
 
     def begin_full_fetch(self, config):
         override = {
             'auto.offset.reset': 'earliest',
             'enable.auto.commit': True
         } 
-        if 'topic' in config:
-            override['topic'] = config['topic']
-        self.activate_consumer_(config.get('kafka', {}), override)
+        self.activate_consumer_(config['topic'], config.get('kafka', {}), override)
 
     def begin_insert(self, config):
-        override = {}
-        if 'topic' in config:
-            override['topic'] = config['topic']
-        self.activate_producer_(config.get('kafka', {}), override)
+        self.activate_producer_(config['topic'], config.get('kafka', {}))
 
     def fetch_batch(self, batch_size):
         if not self.active_consumer_:
