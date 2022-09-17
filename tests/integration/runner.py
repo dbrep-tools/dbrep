@@ -13,7 +13,7 @@ import dbrep.engines.engine_sqlalchemy
 from dbrep.replication import full_copy, incremental_update
 import dbrep.utils
 import dbrep.config
-from drivers import TestDriverSQLAlchemy, TestDriverKafka
+from drivers import make_test_driver #TestDriverSQLAlchemy, TestDriverKafka
 
 
 logger = logging.getLogger(__name__)
@@ -37,21 +37,7 @@ def validate_test_config(config, conn_config):
         raise errors.InvalidTestConfigError('Specified connection ({}) is absent from connection list!'.format(config['config']['dst']['conn']))
     return None
 
-def make_test_driver(config):
-    if 'test-driver' not in config:
-        raise errors.InvalidTestConfigError('Connection config should also specify which test-driver to use, but it is missing `test-driver` field!')
-    if config['test-driver'] == 'sqlalchemy':
-        try:
-            return TestDriverSQLAlchemy(config)
-        except Exception as e:
-            raise errors.InvalidTestDriverError('Failed to create sqlalchemy engine for test driver', e) from e
-    elif config['test-driver'] == 'kafka':
-        try:
-            return TestDriverKafka(config)
-        except Exception as e:
-            raise errors.InvalidTestDriverError('Failed to create kafka engine for test driver', e) from e
-    else:
-        raise errors.InvalidTestConfigError('Unexpected test-driver: {}'.format(config['test-driver']))
+
 
 @contextlib.contextmanager
 def test_driver(config, setup, cleanup):

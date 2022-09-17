@@ -1,5 +1,6 @@
 import time
 import copy
+import errors
 from dbrep.conversions import create_conversion
 
 class TestDriverSQLAlchemy:
@@ -96,3 +97,19 @@ class TestDriverKafka:
 
     def dispose(self):
         pass
+
+def make_test_driver(config):
+    if 'test-driver' not in config:
+        raise errors.InvalidTestConfigError('Connection config should also specify which test-driver to use, but it is missing `test-driver` field!')
+    if config['test-driver'] == 'sqlalchemy':
+        try:
+            return TestDriverSQLAlchemy(config)
+        except Exception as e:
+            raise errors.InvalidTestDriverError('Failed to create sqlalchemy engine for test driver', e) from e
+    elif config['test-driver'] == 'kafka':
+        try:
+            return TestDriverKafka(config)
+        except Exception as e:
+            raise errors.InvalidTestDriverError('Failed to create kafka engine for test driver', e) from e
+    else:
+        raise errors.InvalidTestConfigError('Unexpected test-driver: {}'.format(config['test-driver']))
