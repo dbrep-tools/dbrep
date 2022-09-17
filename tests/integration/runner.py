@@ -13,7 +13,7 @@ import dbrep.engines.engine_sqlalchemy
 from dbrep.replication import full_copy, incremental_update
 import dbrep.utils
 import dbrep.config
-from drivers import TestDriverSQLAlchemy
+from drivers import TestDriverSQLAlchemy, TestDriverKafka
 
 
 logger = logging.getLogger(__name__)
@@ -45,6 +45,11 @@ def make_test_driver(config):
             return TestDriverSQLAlchemy(config)
         except Exception as e:
             raise errors.InvalidTestDriverError('Failed to create sqlalchemy engine for test driver', e) from e
+    elif config['test-driver'] == 'kafka':
+        try:
+            return TestDriverKafka(config)
+        except Exception as e:
+            raise errors.InvalidTestDriverError('Failed to create kafka engine for test driver', e) from e
     else:
         raise errors.InvalidTestConfigError('Unexpected test-driver: {}'.format(config['test-driver']))
 
