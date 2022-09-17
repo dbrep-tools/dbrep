@@ -62,17 +62,17 @@ class KafkaEngine(BaseEngine):
             'auto.offset.reset': 'latest',
             'enable.auto.commit': True
         } 
-        self.activate_consumer_(config, override)
+        self.activate_consumer_(config.get('kafka', {}), override)
 
     def begin_full_fetch(self, config):
         override = {
             'auto.offset.reset': 'earliest',
             'enable.auto.commit': True
         } 
-        self.activate_consumer_(config, override)
+        self.activate_consumer_(config.get('kafka', {}), override)
 
     def begin_insert(self, config):
-        self.activate_producer_(config)
+        self.activate_producer_(config.get('kafka', {}))
 
     def fetch_batch(self, batch_size):
         if not self.active_consumer_:
