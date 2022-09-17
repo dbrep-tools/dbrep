@@ -33,11 +33,11 @@ def read_test_configs():
 
     tests = read_multi_configs('test_', '.yaml', 'tests')
     templates = read_multi_configs('template_', '.yaml', 'templates')
-    res = dbrep.config.unflatten_config({
-        'connections': connections,
+    res = dbrep.config.unflatten_config({        
         'templates': templates,
         'tests': tests
     })
+    res['connections'] = connections
     override_as_list(res, ['setup', 'cleanup', 'steps'])
     return res
 
