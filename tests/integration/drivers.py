@@ -1,3 +1,4 @@
+from collections import Counter
 import time
 import copy
 import errors
@@ -45,13 +46,15 @@ class TestDriverKafka:
         res = self.admin_.create_topics([topic_def])[name]
         while not res.done():
             time.sleep(0.01)
-        print(res.exception())
+        if res.exception():
+            raise res.exception()
 
     def delete_topic_(self, name, **kwargs):
         res = self.admin_.delete_topics([name])[name]
         while not res.done():
             time.sleep(0.01)
-        print(res.exception())
+        if res.exception():
+            raise res.exception()
 
     def push_topic_(self, topic, **kwargs):
         self.producer_.produce(topic, self.conversion_.to_bytes(kwargs.get('msg')), kwargs.get('key'))
@@ -94,7 +97,14 @@ class TestDriverKafka:
                 raw.append(msg)
         finally:
             consumer.close()
-        return raw
+        
+        errs = [x.error() for x in raw if x is not None and x.error() is not None]
+        objs = [self.conversion_.from_bytes(x.value()) for x in raw if x is not None and x.error() is None]
+
+        keys = list(Counter([k for x in objs for k in x.keys()]).keys())
+        batch = [[obj.get(k) for k in keys] for obj in objs]
+
+        return keys, batch
 
     def dispose(self):
         pass
