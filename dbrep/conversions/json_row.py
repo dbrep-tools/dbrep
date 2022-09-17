@@ -6,7 +6,7 @@ class JSONRowFormat(BaseFormat):
     id = 'JSONRow'
 
     def __init__(self, config):
-        super().__init__()
+        super().__init__(config)
 
     def from_bytes(self, bytes):
         return json.load(bytes.decode('utf-8'))
