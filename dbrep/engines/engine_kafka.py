@@ -65,6 +65,7 @@ class KafkaEngine(BaseEngine):
             'enable.auto.commit': True,
         } 
         self.activate_consumer_(config['topic'], config.get('kafka', {}), override)
+        self.consume_timeout_ = config.get('consume_timeout', 10.0)
 
     def begin_full_fetch(self, config):
         override = {
@@ -72,6 +73,7 @@ class KafkaEngine(BaseEngine):
             'enable.auto.commit': True
         } 
         self.activate_consumer_(config['topic'], config.get('kafka', {}), override)
+        self.consume_timeout_ = config.get('consume_timeout', 10.0)
 
     def begin_insert(self, config):
         self.activate_producer_(config['topic'], config.get('kafka', {}))
@@ -80,7 +82,7 @@ class KafkaEngine(BaseEngine):
         if not self.active_consumer_:
             raise Exception("No active consumer!")
         objs = []
-        msgs = self.active_consumer_.consume(batch_size, 2.0)
+        msgs = self.active_consumer_.consume(batch_size, self.consume_timeout_)
         errs = [x.error() for x in msgs if x is not None and x.error() is not None]
         objs = [self.conversion_.from_bytes(x.value()) for x in msgs if x is not None and x.error() is None]
 

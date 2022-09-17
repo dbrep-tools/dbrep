@@ -51,7 +51,7 @@ class TestDriverKafka:
 
     def delete_topic_(self, name, **kwargs):
         res = self.admin_.delete_topics([name])[name]
-        while not res.done():
+        while not res.done() and name in self.admin_.list_topics().topics:
             time.sleep(0.01)
         if res.exception():
             raise res.exception()

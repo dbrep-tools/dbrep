@@ -49,7 +49,7 @@ def incremental_update(src_engine, dst_engine, config):
     logger.debug('Making request to get <src> latest rid...')
     src_rid = src_engine.get_latest_rid(config['src'])
     if src_rid is None:
-        raise NotImplemented
+        raise NotImplementedError()
 
     logger.debug('Making request to get <dst> latest rid...')
     dst_rid = dst_engine.get_latest_rid(config['dst'])
