@@ -1,0 +1,29 @@
+tests:
+  test_kafka2kafka_simple:
+    config:
+      src:
+        conns: [kafka]
+        topic: test_src
+        rid: rid
+      dst:
+        conns: [kafka]
+        topic: test_dst
+        rid: rid
+      modes: [incremental, full-copy]
+    test:
+      src:
+        setup:
+          - create test_src
+          - cmd: push test_src
+            msg: {col: 3, rid: 1}
+          - cmd: push test_src
+            msg: {col: 27, rid: 2}
+          - cmd: push test_src
+            msg: {col: 343, rid: 3}
+        cleanup:
+          - delete test_src
+      dst:
+        setup:
+          - create test_dst
+        cleanup:
+          - delete test_dst

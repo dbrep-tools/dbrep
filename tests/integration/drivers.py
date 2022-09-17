@@ -1,6 +1,6 @@
 import time
 import copy
-from multiprocessing.sharedctypes import Value
+from dbrep.conversions import create_conversion
 
 class TestDriverSQLAlchemy:
     def __init__(self, config):
@@ -30,12 +30,13 @@ class TestDriverKafka:
         import confluent_kafka
         import confluent_kafka.admin
         self.kafka_ = confluent_kafka
-        self.config_ = copy.deepcopy(config)
+        self.config_ = copy.deepcopy(config['kafka'])
         self.config_.update({
             'group.id': 'TestDriver'
         })
         self.admin_ = confluent_kafka.admin.AdminClient(self.config_)
         self.producer_ = confluent_kafka.Producer(self.config_)
+        self.conversion_ = create_conversion(config['format'], config.get('format-config', {}))
 
     def create_topic_(self, name, **kwargs):
         topic_def = self.kafka_.admin.NewTopic(name, kwargs.get('num_partitions', 3))
@@ -51,7 +52,7 @@ class TestDriverKafka:
         print(res.exception())
 
     def push_topic_(self, topic, **kwargs):
-        self.producer_.produce(topic, kwargs.get('msg'), kwargs.get('key'))
+        self.producer_.produce(topic, self.conversion_.to_bytes(kwargs.get('msg')), kwargs.get('key'))
         self.producer_.flush()
 
     def execute(self, query):
