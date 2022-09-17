@@ -51,10 +51,11 @@ class KafkaEngine(BaseEngine):
         consumer = confluent_kafka.Consumer(self.flatten_configs_(config.get('kafka', {}), override))
         try:
             consumer.subscribe([config['topic']])
-            msg = consumer.poll(1.0)
+            msg = consumer.poll(config.get('timeout', 5.0))
         finally:
             consumer.close()
-        
+        if msg is None:
+            return None
         obj = self.conversion_.from_bytes(msg.value())
         return obj[config['rid']]
 
@@ -100,10 +101,6 @@ class KafkaEngine(BaseEngine):
         self.active_producer_.flush()       
 
     def close(self):
-        if self.active_producer_ is not None:
-            self.active_producer_.close()
-            self.active_producer_ = None
-            
         if self.active_consumer_ is not None:
             self.active_consumer_.close()
             self.active_consumer_ = None
