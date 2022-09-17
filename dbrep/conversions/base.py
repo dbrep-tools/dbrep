@@ -1,6 +1,8 @@
 class BaseFormat:
-    def __init__(self):
-        self.id = 'abstract'
+    id = 'abstract'
+    
+    def __init__(self, config):
+        pass
 
     def from_bytes(self, bytes):
         raise NotImplemented('BaseFormat.from_bytes not implemented')
