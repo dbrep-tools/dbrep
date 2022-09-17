@@ -48,7 +48,9 @@ class KafkaEngine(BaseEngine):
             'auto.offset.reset': 'latest',
             'enable.auto.commit': False
         } 
-        consumer = confluent_kafka.Consumer(self.flatten_configs_(config, override))
+        if 'topic' in config:
+            override['topic'] = config['topic']
+        consumer = confluent_kafka.Consumer(self.flatten_configs_(config.get('kafka', {}), override))
         try:
             msg = consumer.poll(1.0)
         finally:
@@ -60,8 +62,10 @@ class KafkaEngine(BaseEngine):
     def begin_incremental_fetch(self, config, min_rid):
         override = {
             'auto.offset.reset': 'latest',
-            'enable.auto.commit': True
+            'enable.auto.commit': True,
         } 
+        if 'topic' in config:
+            override['topic'] = config['topic']
         self.activate_consumer_(config.get('kafka', {}), override)
 
     def begin_full_fetch(self, config):
@@ -69,10 +73,15 @@ class KafkaEngine(BaseEngine):
             'auto.offset.reset': 'earliest',
             'enable.auto.commit': True
         } 
+        if 'topic' in config:
+            override['topic'] = config['topic']
         self.activate_consumer_(config.get('kafka', {}), override)
 
     def begin_insert(self, config):
-        self.activate_producer_(config.get('kafka', {}))
+        override = {}
+        if 'topic' in config:
+            override['topic'] = config['topic']
+        self.activate_producer_(config.get('kafka', {}), override)
 
     def fetch_batch(self, batch_size):
         if not self.active_consumer_:
