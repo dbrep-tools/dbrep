@@ -9,7 +9,7 @@ class JSONRowFormat(BaseFormat):
         super().__init__(config)
 
     def from_bytes(self, bytes):
-        return json.load(bytes.decode('utf-8'))
+        return json.loads(bytes.decode('utf-8'))
     
     def to_bytes(self, object):
         return json.dumps(object).encode('utf-8')
