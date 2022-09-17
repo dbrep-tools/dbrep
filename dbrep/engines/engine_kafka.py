@@ -48,7 +48,7 @@ class KafkaEngine(BaseEngine):
             'auto.offset.reset': 'latest',
             'enable.auto.commit': False
         } 
-        consumer = confluent_kafka.Consumer(self.flatten_configs_(config, override)
+        consumer = confluent_kafka.Consumer(self.flatten_configs_(config, override))
         try:
             msg = consumer.poll(1.0)
         finally:
