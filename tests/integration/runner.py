@@ -221,7 +221,6 @@ def save_result(test, result, connections):
 
 
 def run_tests(config):
-    init_factory()
     tests = make_explicit_tests(config)
     print('Gathered {} tests'.format(len(tests)))
     conns = gather_connections(tests)
