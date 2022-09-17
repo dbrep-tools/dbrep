@@ -105,7 +105,7 @@ class DBAPIEngine(BaseEngine):
 
     def fetch_batch(self, batch_size):
         if not self.active_cursor:
-            raise Exception()
+            raise Exception("No active cursor!")
         keys = [x[0] if isinstance(x, tuple) else x.name for x in self.active_cursor.description]
         return keys, self.active_cursor.fetchmany(batch_size)
 

@@ -87,7 +87,7 @@ class SQLAlchemyEngine(BaseEngine):
 
     def fetch_batch(self, batch_size):
         if not self.active_cursor:
-            raise Exception()
+            raise Exception("No active cursor!")
         keys = list(self.active_cursor.keys())
         return keys, self.active_cursor.fetchmany(batch_size)
 
