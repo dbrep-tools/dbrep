@@ -1,6 +1,5 @@
 import functools
 import importlib
-from sqlite3 import Cursor
 
 from .engine_base import BaseEngine
 from .. import add_engine_factory
