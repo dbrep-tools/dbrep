@@ -3,8 +3,7 @@ import functools
 import confluent_kafka
 
 from .engine_base import BaseEngine
-from .. import add_engine_factory
-
+from . import add_engine_factory
 
 class KafkaEngine(BaseEngine):
     id = 'kafka'
@@ -64,4 +63,4 @@ class KafkaEngine(BaseEngine):
             self.active_cursor.close()
         self.conn.close()
 
-add_engine_factory(DBAPIEngine.id, DBAPIEngine)
+add_engine_factory(KafkaEngine)

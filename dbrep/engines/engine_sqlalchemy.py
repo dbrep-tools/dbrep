@@ -13,7 +13,7 @@
 import functools
 
 from .engine_base import BaseEngine
-from .. import add_engine_factory
+from . import add_engine_factory
 
 class SQLAlchemyEngine(BaseEngine):
     id = 'sqlalchemy'
@@ -98,4 +98,4 @@ class SQLAlchemyEngine(BaseEngine):
         self.conn.close()
         self.engine.dispose()
 
-add_engine_factory(SQLAlchemyEngine.id, SQLAlchemyEngine)
+add_engine_factory(SQLAlchemyEngine)

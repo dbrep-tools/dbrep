@@ -8,7 +8,7 @@ import yaml
 
 from .config import make_config, merge_config, substitute_config
 from .replication import full_copy, incremental_update
-from . import create_engine, add_engine_factory, init_factory
+from . import create_engine
 
 logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
 logger = logging.getLogger()
@@ -111,7 +111,6 @@ def make_engine(conn_config: Union[Dict, str], full_config: Dict):
     return create_engine(config['engine'], config)
 
 def run(config : Dict):
-    init_factory()
     if 'run' not in config:
         if 'mode' not in config or 'src' not in config or 'dst' not in config:
             raise ValueError("Must specify `run` parameter: either name of replication from config, or dictionary specifying replication! Or specify mode, src and dst!")

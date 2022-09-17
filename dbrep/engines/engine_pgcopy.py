@@ -4,7 +4,7 @@ from io import StringIO
 from re import template
 
 from .engine_dbapi import DBAPIEngine
-from .. import add_engine_factory
+from . import add_engine_factory
 
 class PGCopyEngine(DBAPIEngine):
     id = 'pgcopy'
@@ -28,4 +28,4 @@ class PGCopyEngine(DBAPIEngine):
             cur.copy_expert(query, buffer)
         self.conn.commit()
 
-add_engine_factory(PGCopyEngine.id, PGCopyEngine)
+add_engine_factory(PGCopyEngine)
