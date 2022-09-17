@@ -31,7 +31,7 @@ class TestDriverKafka:
     def __init__(self, config):
         import confluent_kafka
         import confluent_kafka.admin
-        self.kafka_ = confluent_kafka
+        self.kafka_module = confluent_kafka
         self.config_ = copy.deepcopy(config['kafka'])
         self.config_.update({
             'group.id': 'TestDriver'
@@ -41,7 +41,7 @@ class TestDriverKafka:
         self.conversion_ = create_conversion(config['format'], config.get('format-config', {}))
 
     def create_topic_(self, name, **kwargs):
-        topic_def = self.kafka_.admin.NewTopic(name, kwargs.get('num_partitions', 3))
+        topic_def = self.kafka_module.admin.NewTopic(name, kwargs.get('num_partitions', 3))
         res = self.admin_.create_topics([topic_def])[name]
         while not res.done():
             time.sleep(0.01)
@@ -83,7 +83,7 @@ class TestDriverKafka:
             'enable.auto.commit': False,
             'auto.offset.reset': 'earliest'
         })
-        consumer = self.kafka_.Consumer(conf)
+        consumer = self.kafka_module.Consumer(conf)
         try:
             consumer.subscribe([config['topic']])
             raw = consumer.consume(num_messages=config.get('min_msg', 1))
