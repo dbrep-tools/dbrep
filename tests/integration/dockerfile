@@ -6,7 +6,11 @@ RUN pip install \
             cx_Oracle==8.3.0 \
             mysql-connector-python==8.0.30 \
             cryptography==37.0.4 \
+            pandas==1.4.4\
+            clickhouse-driver==0.2.4 \
+            confluent-kafka==1.9.2 \
             PyYAML==5.4.1
+
 
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
