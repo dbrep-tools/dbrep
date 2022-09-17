@@ -55,6 +55,7 @@ class TestDriverKafka:
             time.sleep(0.01)
         if res.exception():
             raise res.exception()
+        time.sleep(5.0)
 
     def push_topic_(self, topic, **kwargs):
         self.producer_.produce(topic, self.conversion_.to_bytes(kwargs.get('msg')), kwargs.get('key'))
