@@ -2,6 +2,7 @@ import time
 import copy
 import errors
 from dbrep.conversions import create_conversion
+import dbrep.conversions.json_row
 
 class TestDriverSQLAlchemy:
     def __init__(self, config):
