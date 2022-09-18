@@ -34,13 +34,14 @@ class TestDriverKafka:
         import confluent_kafka.admin
         self.kafka_module = confluent_kafka
         self.config_ = copy.deepcopy(config['kafka'])
-        cfg = copy.deepcopy(self.config_)
+        
         self.config_.update({
             'group.id': 'TestDriver'
         })
-        
+        cfg = copy.deepcopy(self.config_)
+        del cfg['group.id']
         if 'max.poll.interval.ms' in cfg:
-            del cfg[' max.poll.interval.ms']
+            del cfg['max.poll.interval.ms']
         self.admin_ = confluent_kafka.admin.AdminClient(cfg)
         self.producer_ = confluent_kafka.Producer(cfg)
         self.conversion_ = create_conversion(config['format'], config.get('format-config', {}))
