@@ -55,6 +55,10 @@ class KafkaEngine(BaseEngine):
         if self.active_producer_ is not None:
             self.active_producer_ = None
         cfg = self.flatten_configs_(*configs)
+        remove = ['group.id', 'max.poll.interval.ms']
+        for r in remove:
+            if r in cfg:
+                del cfg[r]
         self.active_producer_ = confluent_kafka.Producer(cfg)
         self.active_topic_ = topic
     
@@ -79,7 +83,7 @@ class KafkaEngine(BaseEngine):
     def begin_incremental_fetch(self, config, min_rid):
         override = {
             'auto.offset.reset': 'latest',
-            'enable.auto.commit': True,
+            'enable.auto.commit': False
         } 
         self.activate_consumer_(config['topic'], config.get('kafka', {}), override)
         self.timeout_ = config.get('timeout', self.default_timeout_)
@@ -87,7 +91,7 @@ class KafkaEngine(BaseEngine):
     def begin_full_fetch(self, config):
         override = {
             'auto.offset.reset': 'earliest',
-            'enable.auto.commit': True
+            'enable.auto.commit': False
         } 
         self.activate_consumer_(config['topic'], config.get('kafka', {}), override)
         self.timeout_ = config.get('timeout', self.default_timeout_)
@@ -100,6 +104,7 @@ class KafkaEngine(BaseEngine):
             raise Exception("No active consumer!")
         objs = []
         msgs = self.active_consumer_.consume(batch_size, self.timeout_)
+        self.active_consumer_.commit(asynchronous=False)
         errs = [x.error() for x in msgs if x is not None and x.error() is not None]
         objs = [self.conversion_.from_bytes(x.value()) for x in msgs if x is not None and x.error() is None]
 
