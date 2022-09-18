@@ -82,7 +82,7 @@ class KafkaEngine(BaseEngine):
 
     def begin_incremental_fetch(self, config, min_rid):
         override = {
-            'auto.offset.reset': 'latest',
+            'auto.offset.reset': 'earliest',
             'enable.auto.commit': False
         } 
         self.activate_consumer_(config['topic'], config.get('kafka', {}), override)
@@ -104,7 +104,8 @@ class KafkaEngine(BaseEngine):
             raise Exception("No active consumer!")
         objs = []
         msgs = self.active_consumer_.consume(batch_size, self.timeout_)
-        self.active_consumer_.commit(asynchronous=False)
+        if len(msgs) > 0:
+            self.active_consumer_.commit(asynchronous=False)
         errs = [x.error() for x in msgs if x is not None and x.error() is not None]
         objs = [self.conversion_.from_bytes(x.value()) for x in msgs if x is not None and x.error() is None]
 

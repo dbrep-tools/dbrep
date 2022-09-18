@@ -1,0 +1,19 @@
+templates:
+  kafka2kafka-base:
+    config:
+      src:
+        conns: [kafka]
+        topic: test_src
+        rid: rid
+      dst:
+        conns: [kafka]
+        topic: test_dst
+        rid: rid
+      modes: [incremental, full-copy]
+    test:
+      src.setup: create test_src
+      src.cleanup: delete test_src
+      dst.setup: create test_dst
+      dst.cleanup: delete test_dst
+
+      
