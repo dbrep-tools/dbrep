@@ -11,8 +11,31 @@ from .engine_base import BaseEngine
 from . import add_engine_factory
 from ..conversions import create_conversion
 
+
+
 class KafkaEngine(BaseEngine):
     id = 'kafka'
+
+    @staticmethod
+    def get_latest_message(topic, config):
+        import confluent_kafka
+        consumer = confluent_kafka.Consumer(config)
+        try:
+            consumer.subscribe([topic])
+            topic_meta = consumer.list_topics().topics[topic]
+            partitions = [confluent_kafka.TopicPartition(topic, k) for k in topic_meta.partitions]
+            for p in partitions:
+                (lo, ho) = consumer.get_watermark_offsets(p)
+                p.offset = max(lo, ho - 1)
+            print(partitions)
+            consumer.assign(partitions)
+            msgs = consumer.consume(len(topic_meta.partitions), timeout=1.0)
+        finally:
+            consumer.close()
+        good_msgs = [x for x in msgs if x is not None and x.error() is None]
+        if len(good_msgs) > 0:
+            return good_msgs[-1]
+        return None
 
     def flatten_configs_(self, *configs):
         cfg = copy.deepcopy(self.kafka_config_)
@@ -49,12 +72,7 @@ class KafkaEngine(BaseEngine):
             'auto.offset.reset': 'latest',
             'enable.auto.commit': False
         } 
-        consumer = confluent_kafka.Consumer(self.flatten_configs_(config.get('kafka', {}), override))
-        try:
-            consumer.subscribe([config['topic']])
-            msg = consumer.poll(config.get('timeout', self.default_timeout_))
-        finally:
-            consumer.close()
+        msg = KafkaEngine.get_latest_message(config['topic'], self.flatten_configs_(config.get('kafka', {}), override))
         if msg is None:
             return None
         obj = self.conversion_.from_bytes(msg.value())
