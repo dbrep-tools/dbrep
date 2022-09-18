@@ -17,7 +17,7 @@ class KafkaEngine(BaseEngine):
     id = 'kafka'
 
     @staticmethod
-    def get_latest_message(topic, config):
+    def get_latest_messages(topic, config):
         import confluent_kafka
         consumer = confluent_kafka.Consumer(config)
         try:
@@ -31,10 +31,16 @@ class KafkaEngine(BaseEngine):
             msgs = consumer.consume(len(topic_meta.partitions), timeout=1.0)
         finally:
             consumer.close()
-        good_msgs = [x for x in msgs if x is not None and x.error() is None]
-        if len(good_msgs) > 0:
-            return good_msgs[-1]
-        return None
+        return [x for x in msgs if x is not None and x.error() is None]
+
+    @staticmethod
+    def restart_from_beginning(consumer, topic):
+        topic_meta = consumer.list_topics().topics[topic]
+        partitions = [confluent_kafka.TopicPartition(topic, k) for k in topic_meta.partitions]
+        for p in partitions:
+            (lo, _) = consumer.get_watermark_offsets(p)
+            p.offset = lo
+        consumer.assign(partitions)
 
     def flatten_configs_(self, *configs):
         cfg = copy.deepcopy(self.kafka_config_)
@@ -74,11 +80,11 @@ class KafkaEngine(BaseEngine):
             'auto.offset.reset': 'latest',
             'enable.auto.commit': False
         } 
-        msg = KafkaEngine.get_latest_message(config['topic'], self.flatten_configs_(config.get('kafka', {}), override))
-        if msg is None:
+        msgs = KafkaEngine.get_latest_message(config['topic'], self.flatten_configs_(config.get('kafka', {}), override))
+        if msgs is None or len(msgs) == 0:
             return None
-        obj = self.conversion_.from_bytes(msg.value())
-        return obj[config['rid']]
+        objs = [self.conversion_.from_bytes(x.value()) for x in msgs]
+        return max([x[config['rid']] for x in objs])
 
     def begin_incremental_fetch(self, config, min_rid):
         override = {
@@ -94,6 +100,7 @@ class KafkaEngine(BaseEngine):
             'enable.auto.commit': False
         } 
         self.activate_consumer_(config['topic'], config.get('kafka', {}), override)
+        KafkaEngine.restart_from_beginning(self.active_consumer_, config['topic'])
         self.timeout_ = config.get('timeout', self.default_timeout_)
 
     def begin_insert(self, config):
