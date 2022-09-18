@@ -27,7 +27,6 @@ class KafkaEngine(BaseEngine):
             for p in partitions:
                 (lo, ho) = consumer.get_watermark_offsets(p)
                 p.offset = max(lo, ho - 1)
-            print(partitions)
             consumer.assign(partitions)
             msgs = consumer.consume(len(topic_meta.partitions), timeout=1.0)
         finally:
@@ -54,7 +53,6 @@ class KafkaEngine(BaseEngine):
 
     def activate_producer_(self, topic, *configs):
         if self.active_producer_ is not None:
-            self.active_producer_.close()
             self.active_producer_ = None
         cfg = self.flatten_configs_(*configs)
         self.active_producer_ = confluent_kafka.Producer(cfg)
