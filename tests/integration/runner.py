@@ -83,8 +83,6 @@ def prepare_test_stage(stage_config):
     steps = [stage_config['steps']] if isinstance(stage_config['steps'], str) else stage_config['steps']
     if not isinstance(steps, list):
         raise errors.InvalidTestConfigError('Steps should be of type list, but got'.format(type(steps)))
-    if not all(isinstance(x, str) for x in steps):
-        raise errors.InvalidTestConfigError('Steps should be list of strs, but got list of other types!')
     return steps
         
 def prepare_test_stages(test_config):
