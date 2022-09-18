@@ -7,9 +7,9 @@ from multiprocessing import active_children
 from multiprocessing.dummy import Value
 import confluent_kafka
 
-from .engine_base import BaseEngine
-from . import add_engine_factory
-from ..conversions import create_conversion
+from ..engine_base import BaseEngine
+from .. import add_engine_factory
+from ...conversions import create_conversion
 
 
 
@@ -35,8 +35,9 @@ class KafkaEngine(BaseEngine):
 
     @staticmethod
     def restart_from_beginning(consumer, topic):
+        import confluent_kafka
         topic_meta = consumer.list_topics().topics[topic]
-        consumer.poll(1.0) #poll to restore offsets
+        consumer.poll(5.0) #poll to restore offsets
         partitions = [confluent_kafka.TopicPartition(topic, k) for k in topic_meta.partitions]
         for p in partitions:
             p.offset = confluent_kafka.OFFSET_BEGINNING

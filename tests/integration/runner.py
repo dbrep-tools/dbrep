@@ -7,7 +7,7 @@ import errors
 from config import make_explicit_tests
 from dbrep.engines import create_engine
 import dbrep.engines.engine_dbapi
-import dbrep.engines.engine_kafka
+import dbrep.engines.experimental.kafka
 import dbrep.engines.engine_pgcopy
 import dbrep.engines.engine_sqlalchemy
 from dbrep.replication import full_copy, incremental_update
