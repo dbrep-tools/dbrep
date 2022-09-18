@@ -36,10 +36,10 @@ class KafkaEngine(BaseEngine):
     @staticmethod
     def restart_from_beginning(consumer, topic):
         topic_meta = consumer.list_topics().topics[topic]
+        consumer.poll(1.0) #poll to restore offsets
         partitions = [confluent_kafka.TopicPartition(topic, k) for k in topic_meta.partitions]
         for p in partitions:
-            (lo, _) = consumer.get_watermark_offsets(p)
-            p.offset = lo
+            p.offset = confluent_kafka.OFFSET_BEGINNING
         consumer.assign(partitions)
 
     def flatten_configs_(self, *configs):
@@ -80,7 +80,7 @@ class KafkaEngine(BaseEngine):
             'auto.offset.reset': 'latest',
             'enable.auto.commit': False
         } 
-        msgs = KafkaEngine.get_latest_message(config['topic'], self.flatten_configs_(config.get('kafka', {}), override))
+        msgs = KafkaEngine.get_latest_messages(config['topic'], self.flatten_configs_(config.get('kafka', {}), override))
         if msgs is None or len(msgs) == 0:
             return None
         objs = [self.conversion_.from_bytes(x.value()) for x in msgs]
