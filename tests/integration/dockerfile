@@ -8,6 +8,7 @@ RUN pip install \
             cryptography==37.0.4 \
             pandas==1.4.4\
             clickhouse-driver==0.2.4 \
+            clickhouse-sqlalchemy==0.2.2 \
             confluent-kafka==1.9.2 \
             PyYAML==5.4.1
 
