@@ -38,12 +38,12 @@ templates:
 
   ch2sql-table-int:
     test:
-      src.setup: create table test_src (rid UInt32, col Int32) engine = Log
+      src.setup: create table test_src (rid UInt32, col Nullable(Int32)) engine = Log
       dst.setup: create table test_dst (rid integer, col integer)
 
   
   pg2ch-table-int:
     test:
       src.setup: create table test_src (rid serial, col integer)
-      dst.setup: create table test_dst (rid UInt32, col Int32) engine = Log
+      dst.setup: create table test_dst (rid UInt32, col Nullable(Int32)) engine = Log
   
