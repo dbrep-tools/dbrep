@@ -36,4 +36,14 @@ templates:
       src.setup: create table test_src (rid serial, col timestamp)
       dst.setup: create table test_dst (rid integer, col timestamp)
 
-      
+  ch2sql-table-int:
+    test:
+      src.setup: create table test_src (rid int32, col int32) engine = MergeTree()
+      dst.setup: create table test_dst (rid integer, col integer)
+
+  
+  pg2ch-table-int:
+    test:
+      src.setup: create table test_src (rid serial, col integer)
+      dst.setup: create table test_dst (rid int32, col int32) engine = MergeTree()
+  
