@@ -20,6 +20,7 @@ mysql-connector-python = "^8.0.30"
 pandas = "^1.4.4"
 confluent-kafka = "^1.9.2"
 clickhouse-driver = "^0.2.4"
+clickhouse-sqlalchemy = "^0.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
