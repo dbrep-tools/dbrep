@@ -6,7 +6,7 @@ authors = ["Valentin  Stepanovich <kolhizin@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.8,<4"
 cryptography = "^37.0.4"
 SQLAlchemy = "^1.4.40"
 PyYAML = ">=5.0"
@@ -19,6 +19,7 @@ cx-Oracle = "^8.3.0"
 mysql-connector-python = "^8.0.30"
 pandas = "^1.4.4"
 confluent-kafka = "^1.9.2"
+clickhouse-driver = "^0.2.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
