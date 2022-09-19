@@ -65,7 +65,7 @@ tests:
   test_ch2pg_int:
     template: [sql2sql-base, ch2sql-table-int]
     config:
-      src.conns: [clickhouse-dbapi]
+      src.conns: [clickhouse-dbapi, clickhouse]
       dst.conns: [postgres, postgres-dbapi]
     tests:
       - name: simple
@@ -81,7 +81,7 @@ tests:
     template: [sql2sql-base, pg2ch-table-int]
     config:
       src.conns: [postgres, postgres-dbapi]
-      dst.conns: [clickhouse-dbapi]
+      dst.conns: [clickhouse-dbapi, clickhouse]
     tests:
       - name: simple
         src.setup:
